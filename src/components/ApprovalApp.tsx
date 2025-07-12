@@ -189,83 +189,112 @@ export const ApprovalApp: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {sortedRows.map((row) => (
-              <Card key={row.id} className="transition-all hover:shadow-md">
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 items-center">
-                    {/* ID and Subject */}
-                    <div className="lg:col-span-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline" className="text-xs">
-                          ID: {row.id}
-                        </Badge>
-                      </div>
-                      <p className="text-sm font-medium text-foreground line-clamp-2">
-                        {row.subject}
-                      </p>
-                    </div>
-
-                    {/* Category 1 */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/50">
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                        ID
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide min-w-[300px]">
+                        Subject
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide min-w-[180px]">
                         Category 1
-                      </label>
-                      <SearchableSelect
-                        options={categoryOptions.category_1}
-                        value={row.category_1}
-                        onChange={(value) => handleCategory1Change(row.id, value)}
-                        className="w-full"
-                      />
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Score:</span>
-                        <Badge variant={getScoreBadgeVariant(row.score_1)} className="text-xs">
-                          {row.score_1}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Category 2 */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                        Score 1
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide min-w-[180px]">
                         Category 2
-                      </label>
-                      <SearchableSelect
-                        options={getCategory2Options(row.category_1)}
-                        value={row.category_2}
-                        onChange={(value) => handleCategory2Change(row.id, value)}
-                        className="w-full"
-                      />
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Score:</span>
-                        <Badge variant={getScoreBadgeVariant(row.score_2)} className="text-xs">
-                          {row.score_2}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                        Score 2
+                      </th>
+                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
                         Status
-                      </label>
-                      <div className="flex flex-col gap-2">
-                        <Badge variant="secondary" className="text-xs w-fit">
-                          Pending Approval
-                        </Badge>
-                        {(row.score_1 === 0 || row.score_2 === 0) && (
-                          <div className="flex items-center gap-1 text-warning">
-                            <AlertCircle className="h-3 w-3" />
-                            <span className="text-xs">Zero score detected</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedRows.map((row, index) => (
+                      <tr 
+                        key={row.id} 
+                        className={`border-b border-border hover:bg-muted/30 transition-colors ${
+                          index % 2 === 0 ? 'bg-background' : 'bg-muted/10'
+                        }`}
+                      >
+                        {/* ID */}
+                        <td className="p-4">
+                          <Badge variant="outline" className="text-xs font-mono">
+                            {row.id}
+                          </Badge>
+                        </td>
+
+                        {/* Subject */}
+                        <td className="p-4">
+                          <p className="text-sm font-medium text-foreground line-clamp-2 max-w-[300px]">
+                            {row.subject}
+                          </p>
+                        </td>
+
+                        {/* Category 1 */}
+                        <td className="p-4">
+                          <SearchableSelect
+                            options={categoryOptions.category_1}
+                            value={row.category_1}
+                            onChange={(value) => handleCategory1Change(row.id, value)}
+                            className="min-w-[160px]"
+                          />
+                        </td>
+
+                        {/* Score 1 */}
+                        <td className="p-4">
+                          <Badge variant={getScoreBadgeVariant(row.score_1)} className="text-xs font-mono">
+                            {row.score_1}
+                          </Badge>
+                        </td>
+
+                        {/* Category 2 */}
+                        <td className="p-4">
+                          <SearchableSelect
+                            options={getCategory2Options(row.category_1)}
+                            value={row.category_2}
+                            onChange={(value) => handleCategory2Change(row.id, value)}
+                            className="min-w-[160px]"
+                          />
+                        </td>
+
+                        {/* Score 2 */}
+                        <td className="p-4">
+                          <Badge variant={getScoreBadgeVariant(row.score_2)} className="text-xs font-mono">
+                            {row.score_2}
+                          </Badge>
+                        </td>
+
+                        {/* Status */}
+                        <td className="p-4">
+                          <div className="flex flex-col gap-2">
+                            <Badge variant="secondary" className="text-xs w-fit">
+                              Pending
+                            </Badge>
+                            {(row.score_1 === 0 || row.score_2 === 0) && (
+                              <div className="flex items-center gap-1 text-warning">
+                                <AlertCircle className="h-3 w-3" />
+                                <span className="text-xs">Zero score</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
