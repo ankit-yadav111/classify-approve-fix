@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpDown, Check, AlertCircle } from 'lucide-react';
+import { ArrowUpDown, Check, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SearchableSelect } from './SearchableSelect';
 import { ClassificationRow, generateDummyData, categoryOptions } from '../utils/dummyData';
 import { Button } from './ui/button';
@@ -13,6 +13,8 @@ export const ApprovalApp: React.FC = () => {
   const [data, setData] = useState<ClassificationRow[]>([]);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -118,6 +120,20 @@ export const ApprovalApp: React.FC = () => {
     return categoryOptions.category_2[category1 as keyof typeof categoryOptions.category_2] || [];
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(sortedRows.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedRows = sortedRows.slice(startIndex, endIndex);
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -195,9 +211,6 @@ export const ApprovalApp: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border bg-muted/50">
-                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                        ID
-                      </th>
                       <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide min-w-[300px]">
                         Subject
                       </th>
@@ -213,26 +226,16 @@ export const ApprovalApp: React.FC = () => {
                       <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
                         Score 2
                       </th>
-                      <th className="text-left p-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                        Status
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sortedRows.map((row, index) => (
+                    {paginatedRows.map((row, index) => (
                       <tr 
                         key={row.id} 
                         className={`border-b border-border hover:bg-muted/30 transition-colors ${
                           index % 2 === 0 ? 'bg-background' : 'bg-muted/10'
                         }`}
                       >
-                        {/* ID */}
-                        <td className="p-4">
-                          <Badge variant="outline" className="text-xs font-mono">
-                            {row.id}
-                          </Badge>
-                        </td>
-
                         {/* Subject */}
                         <td className="p-4">
                           <p className="text-sm font-medium text-foreground line-clamp-2 max-w-[300px]">
@@ -273,26 +276,45 @@ export const ApprovalApp: React.FC = () => {
                             {row.score_2}
                           </Badge>
                         </td>
-
-                        {/* Status */}
-                        <td className="p-4">
-                          <div className="flex flex-col gap-2">
-                            <Badge variant="secondary" className="text-xs w-fit">
-                              Pending
-                            </Badge>
-                            {(row.score_1 === 0 || row.score_2 === 0) && (
-                              <div className="flex items-center gap-1 text-warning">
-                                <AlertCircle className="h-3 w-3" />
-                                <span className="text-xs">Zero score</span>
-                              </div>
-                            )}
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {startIndex + 1} to {Math.min(endIndex, sortedRows.length)} of {sortedRows.length} results
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
